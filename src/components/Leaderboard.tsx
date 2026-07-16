@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { LeaderboardRow } from "@/db/schema";
+import type { LeaderboardEntry } from "@/lib/storage";
 
 interface Props {
   onPlayAgain: () => void;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
-  const [rows, setRows] = useState<LeaderboardRow[] | null>(null);
+  const [rows, setRows] = useState<LeaderboardEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
       .then((r) => r.json())
       .then((d) => {
         if (!alive) return;
-        if (d.rows) setRows(d.rows as LeaderboardRow[]);
+        if (d.rows) setRows(d.rows as LeaderboardEntry[]);
         else setError(d.error || "加载失败");
       })
       .catch(() => alive && setError("网络错误"));

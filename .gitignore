@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 dist-ssr/
+.next/
 *.local
 
 # Environment variables
@@ -37,3 +38,6 @@ coverage/
 *.temp
 .cache/
 start.bat
+
+# Local data (leaderboard etc.)
+data/
