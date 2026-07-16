@@ -1,0 +1,5 @@
+笆ｲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.17.8.72:3000
+笨・Ready in 697ms
+

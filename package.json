@@ -1,8 +1,9 @@
 {
-  "name": "nextjs-postgresql-template",
+  "name": "tkoc3-match3",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:open": "start http://localhost:3000 && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",

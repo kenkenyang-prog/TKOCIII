@@ -403,16 +403,17 @@ export default function GamePlay({ playerName, playerGeneral, onGameOver }: Prop
     setTimeout(() => setHintCells(new Set()), 1800);
   }, [phase]);
 
+  const bigMoveAvailable = useMemo(() => {
+    if (phase !== "player") return false;
+    return findAllMoves(boardRef.current).some((m) => m.maxSize >= 4);
+  }, [phase, board]);
+
   if (!gameRef.current) {
     return <div className="p-8 text-center text-amber-100">排兵布阵中...</div>;
   }
   const g = gameRef.current;
   const side = currentSide();
   const isPlayerTurn = phase === "player";
-  const bigMoveAvailable = useMemo(() => {
-    if (phase !== "player") return false;
-    return findAllMoves(boardRef.current).some((m) => m.maxSize >= 4);
-  }, [phase, board]);
 
   const outcomeText =
     result === "player_win"
