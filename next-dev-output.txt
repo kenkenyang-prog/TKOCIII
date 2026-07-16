@@ -3,3 +3,18 @@
 - Network:       http://172.17.8.72:3000
 笨・Ready in 697ms
 
+ GET / 200 in 4.1s (next.js: 3.9s, application-code: 233ms)
+ POST /api/leaderboard 200 in 819ms (next.js: 779ms, application-code: 40ms)
+ POST /api/leaderboard 200 in 21ms (next.js: 5ms, application-code: 16ms)
+ POST /api/leaderboard 200 in 14ms (next.js: 4ms, application-code: 11ms)
+ GET /api/leaderboard 200 in 18ms (next.js: 3ms, application-code: 14ms)
+ GET /api/leaderboard 200 in 19ms (next.js: 8ms, application-code: 11ms)
+ POST /api/leaderboard 200 in 10ms (next.js: 3ms, application-code: 8ms)
+ POST /api/leaderboard 200 in 13ms (next.js: 3ms, application-code: 10ms)
+ POST /api/leaderboard 200 in 11ms (next.js: 3ms, application-code: 8ms)
+ POST /api/leaderboard 200 in 15ms (next.js: 3ms, application-code: 12ms)
+ POST /api/leaderboard 200 in 11ms (next.js: 2ms, application-code: 9ms)
+ GET /api/leaderboard 200 in 17ms (next.js: 3ms, application-code: 14ms)
+ GET /api/leaderboard 200 in 18ms (next.js: 8ms, application-code: 10ms)
+ POST /api/leaderboard 200 in 14ms (next.js: 2ms, application-code: 12ms)
+ POST /api/leaderboard 200 in 11ms (next.js: 2ms, application-code: 9ms)

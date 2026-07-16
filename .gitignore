@@ -41,3 +41,4 @@ start.bat
 
 # Local data (leaderboard etc.)
 data/
+next-dev-output.txt
