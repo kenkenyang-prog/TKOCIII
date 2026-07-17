@@ -23,7 +23,6 @@ import {
   createBoard,
   simulateMove,
   swap,
-  collapse,
   ensureMoveable,
   findHint,
   findAllMoves,
@@ -51,6 +50,7 @@ export interface GameOverPayload {
   score: number;
   breakdown: ScoreBreakdown;
   aiName: string;
+  aiId: string;
 }
 
 interface Props {
@@ -150,8 +150,8 @@ export default function GamePlay({ playerName, playerGeneral, onGameOver }: Prop
   }, [setBoardBoth]);
 
   const animateCascades = useCallback(
-    async (a: Cell, b: Cell, steps: import("@/lib/match3").MatchGroup[][]) => {
-      let work = swap(boardRef.current, a, b);
+    async (a: Cell, b: Cell, steps: import("@/lib/match3").MatchGroup[][], boards: Board[]) => {
+      const work = swap(boardRef.current, a, b);
       setBoardBoth(work);
       setPopping(new Set());
       await sleep(150);
@@ -159,8 +159,7 @@ export default function GamePlay({ playerName, playerGeneral, onGameOver }: Prop
         const cells = steps[d].flatMap((g) => g.cells);
         setPopping(new Set(cells.map((c) => `${c.r}-${c.c}`)));
         await sleep(240);
-        work = collapse(work, steps[d]);
-        setBoardBoth(work);
+        setBoardBoth(boards[d]);
         setPopping(new Set());
         await sleep(130);
       }
@@ -177,7 +176,7 @@ export default function GamePlay({ playerName, playerGeneral, onGameOver }: Prop
       attackerIsPlayer: boolean,
     ): Promise<boolean> => {
       const res = simulateMove(boardRef.current, a, b);
-      await animateCascades(a, b, res.steps);
+      await animateCascades(a, b, res.steps, res.boards);
       const out = resolveCascade(
         attacker,
         defender,
@@ -220,7 +219,7 @@ export default function GamePlay({ playerName, playerGeneral, onGameOver }: Prop
         finalize(res);
         return;
       }
-      if (hadBig && g.actionsInSlot < 5) {
+      if (hadBig && g.actionsInSlot < 5 && g.totalRounds >= 2) {
         // bonus extra action for the same side
         if (sideActed === "player") {
           ensureBoardMoveable();
@@ -514,6 +513,7 @@ export default function GamePlay({ playerName, playerGeneral, onGameOver }: Prop
                       playerGeneral,
                     ),
                     aiName: g.ai.general.name,
+                    aiId: g.ai.general.id,
                   })
                 }
               >

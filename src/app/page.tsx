@@ -16,6 +16,7 @@ export default function Home() {
   const [general, setGeneral] = useState<General | null>(null);
   const [payload, setPayload] = useState<GameOverPayload | null>(null);
   const [lastScore, setLastScore] = useState<number | null>(null);
+  const [highlightId, setHighlightId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
   const handleGameOver = useCallback(
@@ -24,16 +25,17 @@ export default function Home() {
       setLastScore(p.score);
       setScreen("result");
       setSaving(true);
-      try {
-        const resultLabel =
-          p.result === "player_win" ? "win" : p.result === "draw" ? "draw" : "lose";
-        await fetch("/api/leaderboard", {
+      if (p.result === "player_win") {
+        const resultLabel = "win";
+        const res = await fetch("/api/leaderboard", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             playerName: playerName || "无名武将",
             generalId: general?.id ?? "",
             generalName: general?.name ?? "",
+            opponentId: p.aiId ?? "",
+            opponentName: p.aiName ?? "",
             result: resultLabel,
             score: p.score,
             totalRounds: p.totalRounds,
@@ -47,11 +49,10 @@ export default function Home() {
             perfectDefenseRate: p.breakdown.perfectRate,
           }),
         });
-      } catch {
-        // ignore — leaderboard still viewable
-      } finally {
-        setSaving(false);
+        const data = await res.json();
+        if (data.id) setHighlightId(data.id);
       }
+      setSaving(false);
     },
     [playerName, general],
   );
@@ -146,9 +147,10 @@ export default function Home() {
 
   return (
     <Leaderboard
-      highlightScore={lastScore}
+      highlightId={highlightId}
       onPlayAgain={() => {
         setLastScore(null);
+        setHighlightId(null);
         setScreen(playerName ? "select" : "intro");
       }}
     />

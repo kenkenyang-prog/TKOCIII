@@ -5,10 +5,10 @@ import type { LeaderboardEntry } from "@/lib/storage";
 
 interface Props {
   onPlayAgain: () => void;
-  highlightScore?: number | null;
+  highlightId?: number | null;
 }
 
-export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
+export default function Leaderboard({ onPlayAgain, highlightId }: Props) {
   const [rows, setRows] = useState<LeaderboardEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,12 +43,13 @@ export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-xl border border-stone-700">
-          <table className="w-full min-w-[760px] border-collapse text-left text-xs">
+          <table className="w-full min-w-[860px] border-collapse text-left text-xs">
             <thead>
               <tr className="bg-stone-800 text-amber-200">
                 <Th>#</Th>
                 <Th>玩家</Th>
                 <Th>武将</Th>
+                <Th>对手</Th>
                 <Th right>积分</Th>
                 <Th right>总回合</Th>
                 <Th right>行动</Th>
@@ -59,41 +60,39 @@ export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
                 <Th right>射箭率</Th>
                 <Th right>计略率</Th>
                 <Th right>完防率</Th>
+                <Th>时间</Th>
               </tr>
             </thead>
             <tbody>
               {rows === null && !error && (
                 <tr>
-                  <td colSpan={13} className="py-10 text-center text-amber-200/50">
+                  <td colSpan={15} className="py-10 text-center text-amber-200/50">
                     加载中...
                   </td>
                 </tr>
               )}
               {error && (
                 <tr>
-                  <td colSpan={13} className="py-10 text-center text-rose-300">
+                  <td colSpan={15} className="py-10 text-center text-rose-300">
                     {error}
                   </td>
                 </tr>
               )}
               {rows && rows.length === 0 && (
                 <tr>
-                  <td colSpan={13} className="py-10 text-center text-amber-200/50">
+                  <td colSpan={15} className="py-10 text-center text-amber-200/50">
                     榜单尚无记录，去拿下榜首吧！
                   </td>
                 </tr>
               )}
               {rows &&
                 rows.map((r, i) => {
-                  const hi =
-                    highlightScore != null &&
-                    Number(r.score) === highlightScore &&
-                    i < 3;
+                  const hi = highlightId != null && r.id === highlightId;
                   return (
                     <tr
                       key={r.id}
                       className={`border-t border-stone-800 ${
-                        hi ? "bg-amber-500/20" : i % 2 ? "bg-stone-900/40" : ""
+                        hi ? "bg-amber-500/25 ring-1 ring-inset ring-amber-400/50" : i % 2 ? "bg-stone-900/40" : ""
                       }`}
                     >
                       <Td>
@@ -114,13 +113,15 @@ export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
                       <Td>{r.playerName}</Td>
                       <Td>
                         <span className="text-amber-100">{r.generalName}</span>
-                        <span className="ml-1 text-[10px] text-amber-200/40">{r.result}</span>
+                      </Td>
+                      <Td>
+                        <span className="text-rose-300">{r.opponentName}</span>
                       </Td>
                       <Td right>
-                        <b className="text-amber-300">{r.score}</b>
+                        <b className="text-amber-300">{Math.round(r.score)}</b>
                       </Td>
-                      <Td right>{r.totalRounds}</Td>
-                      <Td right>{r.playerActions}</Td>
+                      <Td right>{Math.round(r.totalRounds)}</Td>
+                      <Td right>{Math.round(r.playerActions)}</Td>
                       <Td right>{pct(r.comboRate)}</Td>
                       <Td right>{pct(r.match45Rate)}</Td>
                       <Td right>{pct(r.ultimateRate)}</Td>
@@ -128,6 +129,9 @@ export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
                       <Td right>{pct(r.bowRate)}</Td>
                       <Td right>{pct(r.strategyRate)}</Td>
                       <Td right>{pct(r.perfectDefenseRate)}</Td>
+                      <Td>
+                        <span className="text-amber-200/60">{fmtDate(r.createdAt)}</span>
+                      </Td>
                     </tr>
                   );
                 })}
@@ -137,6 +141,11 @@ export default function Leaderboard({ onPlayAgain, highlightScore }: Props) {
       </div>
     </div>
   );
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function pct(n: string | number): string {

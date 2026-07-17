@@ -128,6 +128,7 @@ export function applyHit(
   def.hp = Math.max(0, def.hp - damage);
   if (perfect) {
     def.ultAccum = Math.min(50, def.ultAccum + perfectBonus);
+    def.defenseAccum = Math.max(0, def.defenseAccum - perfectBonus);
   } else {
     def.rage = Math.min(50, def.rage + damage * rageCoeff(def));
     def.defenseAccum = Math.max(0, def.defenseAccum - damage);
@@ -223,13 +224,12 @@ export function resolveCascade(
           strategyThisCascade = true;
           let dmg = ((att.intel - def.intel) * count) / 15 * coeff;
           if (dmg < 5) dmg = 5;
-          def.hp = Math.max(0, def.hp - dmg);
           def.ultAccum = Math.max(0, def.ultAccum - dmg);
           def.defenseAccum = Math.max(0, def.defenseAccum - dmg);
           def.retreatAccum = Math.max(0, def.retreatAccum - 5);
           def.rage = Math.min(50, def.rage + 5 + dmg * rageCoeff(def));
           logs.push({
-            text: `计略 ${count}连×${coeff} 造成 ${Math.round(dmg)} 伤害，敌必杀/防御下降`,
+            text: `计略 ${count}连×${coeff} 敌必杀/防御下降 ${Math.round(dmg)}`,
             kind: "strategy",
             side: att.side,
           });
@@ -348,7 +348,6 @@ export function beginRetreat(c: Combatant): void {
 
 // ---- Turn order ----
 const RATIO_PATTERNS: { ratio: number; a: number; pattern: string }[] = [
-  { ratio: 1 / 2, a: 1, pattern: "AAB" },
   { ratio: 2 / 3, a: 2, pattern: "ABAAB" },
   { ratio: 3 / 4, a: 3, pattern: "ABABAAB" },
   { ratio: 4 / 5, a: 4, pattern: "ABABABAAB" },
@@ -376,7 +375,7 @@ export function buildTurnOrder(player: Combatant, ai: Combatant): TurnOrder {
   const heavy = Math.max(pw, aw);
   const ratio = light / heavy;
   let chosen = RATIO_PATTERNS[0];
-  if (ratio >= 1 / 2) {
+  if (ratio >= 2 / 3) {
     let best = RATIO_PATTERNS[0];
     let bestDiff = Infinity;
     for (const p of RATIO_PATTERNS) {
@@ -443,7 +442,7 @@ export function computeScore(s: ScoreInput, general: General): ScoreBreakdown {
     (100 - general.intelligence) * 5 +
     general.virtue * 5 +
     (100 - general.stamina) * 10;
-  const score = Math.floor(numerator / totalRounds);
+  const score = Math.max(1, Math.floor(numerator / totalRounds));
   const r = (n: number) => totalRounds > 0 ? n / totalRounds : 0;
   return {
     score,

@@ -19,6 +19,8 @@ interface SubmitBody {
   playerName: string;
   generalId: string;
   generalName: string;
+  opponentId: string;
+  opponentName: string;
   result: string;
   score: number;
   totalRounds: number;
@@ -45,11 +47,20 @@ export async function POST(req: Request) {
     }
     const num = (v: number | undefined, fallback = 0) =>
       Number.isFinite(v as number) ? (v as number) : fallback;
+    const result = (body.result ?? "").toString().slice(0, 16);
+    if (result !== "win") {
+      return NextResponse.json(
+        { error: "Only wins are recorded" },
+        { status: 400 },
+      );
+    }
     const entry = await addEntry({
       playerName: name,
       generalId: (body.generalId ?? "").toString().slice(0, 40),
       generalName: (body.generalName ?? "").toString().slice(0, 40),
-      result: (body.result ?? "win").toString().slice(0, 16),
+      opponentId: (body.opponentId ?? "").toString().slice(0, 40),
+      opponentName: (body.opponentName ?? "").toString().slice(0, 40),
+      result,
       score: Math.max(0, Math.floor(body.score)),
       totalRounds: Math.max(0, Math.floor(body.totalRounds)),
       playerActions: Math.max(0, Math.floor(body.playerActions)),

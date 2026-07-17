@@ -6,6 +6,8 @@ export interface LeaderboardEntry {
   playerName: string;
   generalId: string;
   generalName: string;
+  opponentId: string;
+  opponentName: string;
   result: string;
   score: number;
   totalRounds: number;

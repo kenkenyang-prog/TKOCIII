@@ -297,6 +297,7 @@ export function ensureMoveable(board: Board, rng: () => number = Math.random): B
 // Fully resolve cascades for a board, returning cascade steps + final board.
 export interface CascadeResult {
   steps: MatchGroup[][]; // matches per cascade depth
+  boards: Board[]; // board after each collapse step (for animation)
   finalBoard: Board;
   maxDepth: number;
 }
@@ -304,6 +305,7 @@ export interface CascadeResult {
 export function simulateMove(board: Board, a: Cell, b: Cell, rng: () => number = Math.random): CascadeResult {
   let work = swap(board, a, b);
   const steps: MatchGroup[][] = [];
+  const boards: Board[] = [];
   let depth = 0;
   while (true) {
     const groups = findMatches(work);
@@ -311,8 +313,9 @@ export function simulateMove(board: Board, a: Cell, b: Cell, rng: () => number =
     steps.push(groups);
     depth++;
     work = collapse(work, groups, rng);
+    boards.push(cloneBoard(work));
   }
-  return { steps, finalBoard: work, maxDepth: depth };
+  return { steps, boards, finalBoard: work, maxDepth: depth };
 }
 
 export function comboCoefficient(depth: number): number {
